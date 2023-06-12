@@ -69,7 +69,7 @@ impl TryFrom<u8> for VoteType {
 
 /// Overlord messages.
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone, Debug, Display, PartialEq, Eq)]
+#[derive(Clone, Debug, Display, PartialEq, Eq, Deserialize, Serialize)]
 pub enum OverlordMsg<T: Codec> {
     /// Signed proposal message.
     #[display(fmt = "Signed Proposal")]
@@ -164,17 +164,18 @@ pub enum ViewChangeReason {
 }
 
 /// A signed proposal.
-#[derive(Clone, Debug, Display, PartialEq, Eq)]
+#[derive(Clone, Debug, Display, PartialEq, Eq, Deserialize, Serialize)]
 #[display(fmt = "Signed Proposal {:?}", proposal)]
 pub struct SignedProposal<T: Codec> {
     /// Signature of the proposal.
+    #[serde(with = "super::serde_hex")]
     pub signature: Bytes,
     /// A proposal.
     pub proposal: Proposal<T>,
 }
 
 /// A proposal
-#[derive(Clone, Debug, Display, PartialEq, Eq)]
+#[derive(Clone, Debug, Display, PartialEq, Eq, Deserialize, Serialize)]
 #[display(fmt = "Proposal height {}, round {}", height, round)]
 pub struct Proposal<T: Codec> {
     /// Height of the proposal.
@@ -184,15 +185,17 @@ pub struct Proposal<T: Codec> {
     /// Proposal content.
     pub content: T,
     /// Proposal block hash.
+    #[serde(with = "super::serde_hex")]
     pub block_hash: Hash,
     /// Optional field. If the proposal has a PoLC, this contains the lock round and lock votes.
     pub lock: Option<PoLC>,
     /// Proposer address.
+    #[serde(with = "super::serde_hex")]
     pub proposer: Address,
 }
 
 /// A PoLC.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct PoLC {
     /// Lock round of the proposal.
     pub lock_round: u64,
@@ -201,14 +204,16 @@ pub struct PoLC {
 }
 
 /// A signed vote.
-#[derive(Clone, Debug, Display, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, Display, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[display(fmt = "Signed vote {:?}", vote)]
 pub struct SignedVote {
     /// Signature of the vote.
+    #[serde(with = "super::serde_hex")]
     pub signature: Bytes,
     /// A vote.
     pub vote: Vote,
     /// Voter address.
+    #[serde(with = "super::serde_hex")]
     pub voter: Address,
 }
 
@@ -306,7 +311,7 @@ impl AggregatedVote {
 }
 
 /// A vote.
-#[derive(Clone, Debug, Display, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, Display, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[display(fmt = "{:?} vote height {}, round {}", vote_type, height, round)]
 pub struct Vote {
     /// Height of the vote.
@@ -316,11 +321,12 @@ pub struct Vote {
     /// Type of the vote.
     pub vote_type: VoteType,
     /// Block hash of the vote.
+    #[serde(with = "super::serde_hex")]
     pub block_hash: Hash,
 }
 
 /// A commit.
-#[derive(Clone, Debug, Display, PartialEq, Eq)]
+#[derive(Clone, Debug, Display, PartialEq, Eq, Deserialize, Serialize)]
 #[display(fmt = "Commit height {}", height)]
 pub struct Commit<T: Codec> {
     /// Height of the commit.
@@ -332,20 +338,21 @@ pub struct Commit<T: Codec> {
 }
 
 /// A Proof.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Proof {
     /// Height of the proof.
     pub height: u64,
     /// Round of the proof.
     pub round: u64,
     /// Block hash of the proof.
+    #[serde(with = "super::serde_hex")]
     pub block_hash: Hash,
     /// Aggregated signature of the proof.
     pub signature: AggregatedSignature,
 }
 
 /// A rich status.
-#[derive(Clone, Debug, Display, PartialEq, Eq)]
+#[derive(Clone, Debug, Display, PartialEq, Eq, Deserialize, Serialize)]
 #[display(fmt = "Rich status height {}", height)]
 pub struct Status {
     /// New height.
@@ -466,18 +473,20 @@ impl AggregatedChoke {
 }
 
 /// A signed choke.
-#[derive(Clone, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct SignedChoke {
     /// The signature of the choke.
+    #[serde(with = "super::serde_hex")]
     pub signature: Signature,
     /// The choke message.
     pub choke: Choke,
     /// The choke address.
+    #[serde(with = "super::serde_hex")]
     pub address: Address,
 }
 
 /// A choke.
-#[derive(Clone, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Choke {
     /// The height of the choke.
     pub height: u64,
